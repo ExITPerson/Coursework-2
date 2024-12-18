@@ -1,12 +1,14 @@
+import pandas as pd
+
 from src.abstract_classes import AbstractAPIJob
 import requests
 
 
-class JobOpening(AbstractAPIJob):
+class HeadHunterAPI(AbstractAPIJob):
 
-    def job_openings(self):
+    def get_vacancies(self, name=None) -> pd.DataFrame:
         url = "https://api.hh.ru/vacancies"
-        params = {"period": 90}
+        params = {"text": name}
         response = requests.get(url, params=params)
 
         if response.status_code == 200:
