@@ -1,11 +1,17 @@
 from src.job_opening import HeadHunterAPI
-from src.data_filtering import Vacancy
+import json
 
+from src.vacancy import Vacancy
 
 if __name__ == "__main__":
-    response = HeadHunterAPI()
-    hh_vacancies = response.get_vacancies("Python")
+    hh_vacancies = HeadHunterAPI("Python").get_vacancies()
+    #print(hh_vacancies)
 
-    vacancies_list = Vacancy.cast_to_object_list(hh_vacancies)
-    print(vacancies_list)
+    job_search = Vacancy("100000-150000", "Москва", 4, ["sql", "junior"])
+    vacancy = job_search.custom(hh_vacancies)
+
+    vacancy1 = job_search.filter_vacancies()
+    print(vacancy1)
+
+
 
