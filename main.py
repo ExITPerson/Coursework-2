@@ -15,6 +15,7 @@ if __name__ == "__main__":
     for vacancy in vacancy1:
         print(vacancy["id"])
 
+
     # data = JsonSaver()
     # data1 = data.save_data(vacancy1, "vacancies")
     # data2 = data.del_data(vacancy1, "vacancies")
