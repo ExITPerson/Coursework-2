@@ -12,10 +12,13 @@ if __name__ == "__main__":
     vacancy = job_search.custom(hh_vacancies)
 
     vacancy1 = job_search.filter_vacancies()
-    # for vacancy in vacancy1:
-    #     print(vacancy["id"])
+    for vacancy in vacancy1:
+        print(vacancy["id"])
 
-    JsonSaver().save_data(vacancy1, "vacancies")
+    data = JsonSaver()
+    data1 = data.save_data(vacancy1, "vacancies")
+    # data2 = data.del_data(vacancy1, "vacancies")
+
 
 
 
