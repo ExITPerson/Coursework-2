@@ -28,7 +28,6 @@ class Vacancy:
         return cls.custom_vacancies
 
     def filter_vacancies(self):
-        #for word in self.keywords:
         for vacancy in Vacancy.custom_vacancies:
             requirement = str(vacancy["snippet"]["requirement"]).lower()
             responsibility = str(vacancy["snippet"]["responsibility"]).lower()
