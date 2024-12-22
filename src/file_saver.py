@@ -1,5 +1,10 @@
+import csv
+
+import pandas as pd
 import json
 import os.path
+
+import pandas.errors
 
 from src.abstract_classes import AbstractSaveFile
 from src.utils import content_id
@@ -16,7 +21,7 @@ class JsonSaver(AbstractSaveFile):
             with open(f"data/{cls.file_name}.json", "r", encoding="utf-8") as f:
                 data_file = json.load(f)
                 for x in data:
-                    if content_id(cls.file_name, x["id"]):
+                    if content_id(data_file, x["id"]):
                         del data_file[data_file.index(x)]
             for i in data:
                 data_file.append(i)
@@ -29,10 +34,62 @@ class JsonSaver(AbstractSaveFile):
     @classmethod
     def del_data(cls, data, name):
         cls.file_name = name
-        with open(f"data/{cls.file_name}.json", "r", encoding="utf-8") as f:
-            data_file = json.load(f)
-        for x in data:
-            if content_id(cls.file_name, x["id"]):
-                del data_file[data_file.index(x)]
-        with open(f"data/{cls.file_name}.json", "w", encoding="utf-8") as file:
-            json.dump(data_file, file, indent=4, ensure_ascii=False)
+        if os.path.exists(f"data/{cls.file_name}.json"):
+            with open(f"data/{cls.file_name}.json", "r", encoding="utf-8") as f:
+                data_file = json.load(f)
+            for x in data:
+                if content_id(data_file, x["id"]):
+                    del data_file[data_file.index(x)]
+            with open(f"data/{cls.file_name}.json", "w", encoding="utf-8") as file:
+                json.dump(data_file, file, indent=4, ensure_ascii=False)
+        else:
+            print("Такого файла не существует")
+
+class CSVSaver(AbstractSaveFile):
+    file_name = None
+
+    @classmethod
+    def save_data(cls, data, name):
+        cls.file_name = name
+        if os.path.exists(f"data/{cls.file_name}.csv"):
+            csv_file = f"data/{cls.file_name}.csv"
+            try:
+                df = pd.read_csv(csv_file)
+                data_file = df.to_dict("records")
+
+                new_data = []
+                for x in data:
+                    if content_id(data_file, x["id"]):
+                        new_data.append(x)
+                for i in data:
+                    new_data.append(i)
+                print(len(new_data))
+                df = pd.DataFrame(new_data)
+                df.to_csv(f"data/{cls.file_name}.csv", index=False, encoding="utf-8")
+            except pandas.errors.EmptyDataError:
+                df = pd.DataFrame(data)
+                df.to_csv(f"data/{cls.file_name}.csv", index=False, encoding="utf-8")
+        else:
+            df = pd.DataFrame(data)
+            df.to_csv(f"data/{cls.file_name}.csv", index=False, encoding="utf-8")
+
+
+    @classmethod
+    def del_data(cls, data, name):
+        cls.file_name = name
+        if os.path.exists(f"data/{cls.file_name}.csv"):
+            csv_file = f"data/{cls.file_name}.csv"
+            try:
+                df = pd.read_csv(csv_file)
+                data_file = df.to_dict("records")
+                new_data = []
+                for x in data:
+                    if content_id(data_file, x["id"]):
+                        new_data.append(x)
+                print(data_file)
+                df = pd.DataFrame(new_data)
+                df.to_csv(f"data/{cls.file_name}.csv", index=False, encoding="utf-8")
+            except pandas.errors.EmptyDataError:
+                print("Файл пустой, удалять нечего!")
+        else:
+            print("Такого файла не существует")
