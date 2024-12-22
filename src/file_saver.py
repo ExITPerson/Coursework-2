@@ -93,3 +93,45 @@ class CSVSaver(AbstractSaveFile):
                 print("Файл пустой, удалять нечего!")
         else:
             print("Такого файла не существует")
+
+
+class ExcelSaver(AbstractSaveFile):
+    file_name = None
+
+    @classmethod
+    def save_data(cls, data, name):
+        cls.file_name = name
+        if os.path.exists(f"data/{cls.file_name}.xlsx"):
+            csv_file = f"data/{cls.file_name}.xlsx"
+
+            df = pd.read_excel(csv_file)
+            data_file = df.to_dict("records")
+            new_data = []
+            for x in data:
+                if content_id(data_file, x["id"]):
+                    new_data.append(x)
+            for i in data:
+                new_data.append(i)
+            df = pd.DataFrame(new_data)
+            df.to_excel(f"data/{cls.file_name}.xlsx", index=False)
+        else:
+            df = pd.DataFrame(data)
+            df.to_excel(f"data/{cls.file_name}.xlsx", index=False)
+
+    @classmethod
+    def del_data(cls, data, name):
+        cls.file_name = name
+        if os.path.exists(f"data/{cls.file_name}.xlsx"):
+            csv_file = f"data/{cls.file_name}.xlsx"
+
+            df = pd.read_excel(csv_file)
+            data_file = df.to_dict("records")
+            new_data = []
+            for x in data:
+                if content_id(data_file, x["id"]):
+                    new_data.append(x)
+            df = pd.DataFrame(new_data)
+            df.to_excel(f"data/{cls.file_name}.xlsx", index=False)
+
+        else:
+            print("Такого файла не существует")

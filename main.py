@@ -1,4 +1,4 @@
-from src.file_saver import JsonSaver, CSVSaver
+from src.file_saver import JsonSaver, CSVSaver, ExcelSaver
 from src.job_opening import HeadHunterAPI
 import json
 
@@ -18,9 +18,12 @@ if __name__ == "__main__":
     # data = JsonSaver()
     # data1 = data.save_data(vacancy1, "vacancies")
     # data2 = data.del_data(vacancy1, "vacancies")
-    data_csv = CSVSaver()
-    data2 = data_csv.save_data(vacancy1, "vacancies")
+    # data_csv = CSVSaver()
+    # data2 = data_csv.save_data(vacancy1, "vacancies")
     # data_del = data_csv.del_data(vacancy1, "vacancies")
+    # data_excel = ExcelSaver()
+    # data_save = data_excel.save_data(vacancy1, "vacancies")
+    # data_del = data_excel.del_data(vacancy1, "vacancies")
 
 
 
