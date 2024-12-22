@@ -1,5 +1,3 @@
-import csv
-
 import pandas as pd
 import json
 import os.path
@@ -46,6 +44,7 @@ class JsonSaver(AbstractSaveFile):
             print("Такого файла не существует")
 
 class CSVSaver(AbstractSaveFile):
+
     file_name = None
 
     @classmethod
@@ -96,6 +95,7 @@ class CSVSaver(AbstractSaveFile):
 
 
 class ExcelSaver(AbstractSaveFile):
+
     file_name = None
 
     @classmethod
@@ -133,5 +133,41 @@ class ExcelSaver(AbstractSaveFile):
             df = pd.DataFrame(new_data)
             df.to_excel(f"data/{cls.file_name}.xlsx", index=False)
 
+        else:
+            print("Такого файла не существует")
+
+
+class TXTSaver(AbstractSaveFile):
+
+    file_name = None
+
+    @classmethod
+    def save_data(cls, data, name):
+        cls.file_name = name
+        if os.path.exists(f"data/{name}.txt"):
+            with open(f"data/{cls.file_name}.txt", "r", encoding="utf-8") as f:
+                data_file = json.load(f)
+                for x in data:
+                    if content_id(data_file, x["id"]):
+                        del data_file[data_file.index(x)]
+            for i in data:
+                data_file.append(i)
+            with open(f"data/{cls.file_name}.txt", "w", encoding="utf-8") as file:
+                json.dump(data_file, file, indent=4, ensure_ascii=False)
+        else:
+            with open(f"data/{cls.file_name}.txt", "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+
+    @classmethod
+    def del_data(cls, data, name):
+        cls.file_name = name
+        if os.path.exists(f"data/{cls.file_name}.txt"):
+            with open(f"data/{cls.file_name}.txt", "r", encoding="utf-8") as f:
+                data_file = json.load(f)
+            for x in data:
+                if content_id(data_file, x["id"]):
+                    del data_file[data_file.index(x)]
+            with open(f"data/{cls.file_name}.txt", "w", encoding="utf-8") as file:
+                json.dump(data_file, file, indent=4, ensure_ascii=False)
         else:
             print("Такого файла не существует")
