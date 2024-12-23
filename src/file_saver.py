@@ -5,40 +5,39 @@ import os.path
 import pandas.errors
 
 from src.abstract_classes import AbstractSaveFile
-from src.utils import content_id
 
 
 class JsonSaver(AbstractSaveFile):
 
     file_name = None
+    path = "data"
 
     @classmethod
     def save_data(cls, data, name):
         cls.file_name = name
-        if os.path.exists(f"data/{name}.json"):
-            with open(f"data/{cls.file_name}.json", "r", encoding="utf-8") as f:
+        if os.path.exists(f"{cls.path}/{name}.json"):
+            with open(f"{cls.path}/{cls.file_name}.json", "r", encoding="utf-8") as f:
                 data_file = json.load(f)
-                for x in data:
-                    if content_id(data_file, x["id"]):
-                        del data_file[data_file.index(x)]
-            for i in data:
-                data_file.append(i)
-            with open(f"data/{cls.file_name}.json", "w", encoding="utf-8") as file:
+
+            data_file = [item for item in data_file if item['id'] not in {x['id'] for x in data}]
+            data_file.extend(data)
+
+            with open(f"{cls.path}/{cls.file_name}.json", "w", encoding="utf-8") as file:
                 json.dump(data_file, file, indent=4, ensure_ascii=False)
         else:
-            with open(f"data/{cls.file_name}.json", "w", encoding="utf-8") as f:
+            with open(f"{cls.path}/{cls.file_name}.json", "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
 
     @classmethod
     def del_data(cls, data, name):
         cls.file_name = name
-        if os.path.exists(f"data/{cls.file_name}.json"):
-            with open(f"data/{cls.file_name}.json", "r", encoding="utf-8") as f:
+        if os.path.exists(f"{cls.path}/{cls.file_name}.json"):
+            with open(f"{cls.path}/{cls.file_name}.json", "r", encoding="utf-8") as f:
                 data_file = json.load(f)
-            for x in data:
-                if content_id(data_file, x["id"]):
-                    del data_file[data_file.index(x)]
-            with open(f"data/{cls.file_name}.json", "w", encoding="utf-8") as file:
+
+            data_file = [item for item in data_file if item['id'] not in {x['id'] for x in data}]
+
+            with open(f"{cls.path}/{cls.file_name}.json", "w", encoding="utf-8") as file:
                 json.dump(data_file, file, indent=4, ensure_ascii=False)
         else:
             print("Такого файла не существует")
@@ -56,15 +55,12 @@ class CSVSaver(AbstractSaveFile):
                 df = pd.read_csv(csv_file)
                 data_file = df.to_dict("records")
 
-                new_data = []
-                for x in data:
-                    if content_id(data_file, x["id"]):
-                        new_data.append(x)
-                for i in data:
-                    new_data.append(i)
-                print(len(new_data))
+                new_data = [item for item in data_file if item['id'] not in {x['id'] for x in data}]
+                new_data.extend(data)
+
                 df = pd.DataFrame(new_data)
                 df.to_csv(f"data/{cls.file_name}.csv", index=False, encoding="utf-8")
+
             except pandas.errors.EmptyDataError:
                 df = pd.DataFrame(data)
                 df.to_csv(f"data/{cls.file_name}.csv", index=False, encoding="utf-8")
@@ -81,11 +77,9 @@ class CSVSaver(AbstractSaveFile):
             try:
                 df = pd.read_csv(csv_file)
                 data_file = df.to_dict("records")
-                new_data = []
-                for x in data:
-                    if content_id(data_file, x["id"]):
-                        new_data.append(x)
-                print(data_file)
+
+                new_data = [item for item in data_file if item['id'] not in {x['id'] for x in data}]
+
                 df = pd.DataFrame(new_data)
                 df.to_csv(f"data/{cls.file_name}.csv", index=False, encoding="utf-8")
             except pandas.errors.EmptyDataError:
@@ -103,15 +97,12 @@ class ExcelSaver(AbstractSaveFile):
         cls.file_name = name
         if os.path.exists(f"data/{cls.file_name}.xlsx"):
             csv_file = f"data/{cls.file_name}.xlsx"
-
             df = pd.read_excel(csv_file)
             data_file = df.to_dict("records")
-            new_data = []
-            for x in data:
-                if content_id(data_file, x["id"]):
-                    new_data.append(x)
-            for i in data:
-                new_data.append(i)
+
+            new_data = [item for item in data_file if item['id'] not in {x['id'] for x in data}]
+            new_data.extend(data)
+
             df = pd.DataFrame(new_data)
             df.to_excel(f"data/{cls.file_name}.xlsx", index=False)
         else:
@@ -126,10 +117,9 @@ class ExcelSaver(AbstractSaveFile):
 
             df = pd.read_excel(csv_file)
             data_file = df.to_dict("records")
-            new_data = []
-            for x in data:
-                if content_id(data_file, x["id"]):
-                    new_data.append(x)
+
+            new_data = [item for item in data_file if item['id'] not in {x['id'] for x in data}]
+
             df = pd.DataFrame(new_data)
             df.to_excel(f"data/{cls.file_name}.xlsx", index=False)
 
@@ -147,11 +137,10 @@ class TXTSaver(AbstractSaveFile):
         if os.path.exists(f"data/{name}.txt"):
             with open(f"data/{cls.file_name}.txt", "r", encoding="utf-8") as f:
                 data_file = json.load(f)
-                for x in data:
-                    if content_id(data_file, x["id"]):
-                        del data_file[data_file.index(x)]
-            for i in data:
-                data_file.append(i)
+
+            data_file = [item for item in data_file if item['id'] not in {x['id'] for x in data}]
+            data_file.extend(data)
+
             with open(f"data/{cls.file_name}.txt", "w", encoding="utf-8") as file:
                 json.dump(data_file, file, indent=4, ensure_ascii=False)
         else:
@@ -164,9 +153,9 @@ class TXTSaver(AbstractSaveFile):
         if os.path.exists(f"data/{cls.file_name}.txt"):
             with open(f"data/{cls.file_name}.txt", "r", encoding="utf-8") as f:
                 data_file = json.load(f)
-            for x in data:
-                if content_id(data_file, x["id"]):
-                    del data_file[data_file.index(x)]
+
+            data_file = [item for item in data_file if item['id'] not in {x['id'] for x in data}]
+
             with open(f"data/{cls.file_name}.txt", "w", encoding="utf-8") as file:
                 json.dump(data_file, file, indent=4, ensure_ascii=False)
         else:
