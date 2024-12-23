@@ -10,10 +10,11 @@ if __name__ == "__main__":
 
     job_search = Vacancy("100000-150000", "Москва", 4, ["sql", "junior"])
     vacancy = job_search.custom(hh_vacancies)
+    print(vacancy[0])
 
-    vacancy1 = job_search.filter_vacancies()
-    for vacancy in vacancy1:
-        print(vacancy)
+    # vacancy1 = job_search.filter_vacancies()
+    # for vacancy in vacancy1:
+    #     print(vacancy)
 
 
     # data = JsonSaver()
