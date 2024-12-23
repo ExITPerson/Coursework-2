@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     vacancy1 = job_search.filter_vacancies()
     for vacancy in vacancy1:
-        print(vacancy["id"])
+        print(vacancy)
 
 
     # data = JsonSaver()
