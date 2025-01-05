@@ -6,30 +6,35 @@ from src.abstract_classes import AbstractAPIJob
 
 
 class HeadHunterAPI(AbstractAPIJob):
-    def __init__(self, keyword: str) -> None:
-        self.keyword = keyword
-        self.url = "https://api.hh.ru/vacancies"
-        self.headers = {"User-Agent": "HH-User-Agent"}
-        self.params = {"text": "", "page": 0, "per_page": 100}
-        self.vacancies: list = []
-        self.data: int = 0
+    """Класс для получения информации о вакансиях из сервиса HH"""
 
-    def get_vacancies(self) -> list:
-        self.params["text"] = self.keyword
-        response = requests.get(self.url, headers=self.headers, params=self.params)
+    def __init__(self) -> None:
+        """Инициализация"""
+        # self.keyword = keyword
+        self.__url = "https://api.hh.ru/vacancies"
+        self.__headers = {"User-Agent": "HH-User-Agent"}
+        self.__params = {"text": "", "page": 0, "per_page": 100}
+        self.__vacancies: list = []
+
+    def __get_response(self) -> Any:
+        """Функция для выполнения запроса к API"""
+        response = requests.get(self.__url, headers=self.__headers, params=self.__params)
         if response.status_code == 200:
-            total_pages = response.json()["pages"]
+            return response.json()
         else:
             raise BaseException(f"Статус код: {response.status_code}")
 
-        while self.params.get("page") != total_pages:
-            response = requests.get(self.url, headers=self.headers, params=self.params)
+    def get_vacancies(self, keyword: str) -> Any:
+        """Функция получения данных о вакансиях через API"""
+        self.__params["text"] = keyword
+        initial_response = self.__get_response()
+        total_pages = initial_response["pages"]
 
-            if response.status_code == 200:
-                vacancies = response.json()["items"]
-                self.vacancies.extend(vacancies)
-                self.params["page"] += 1
-            else:
-                raise BaseException(f"Статус код: {response.status_code}")
+        while self.__params.get("page") < total_pages:
+            self.__vacancies.extend(initial_response["items"])
+            self.__params["page"] += 1
 
-        return self.vacancies
+            if self.__params["page"] < total_pages:
+                initial_response = self.__get_response()
+
+        return self.__vacancies

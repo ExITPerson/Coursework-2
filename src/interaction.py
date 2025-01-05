@@ -1,11 +1,12 @@
+from src.file_saver import CSVSaver, ExcelSaver, JsonSaver, TXTSaver
 from src.job_opening import HeadHunterAPI
 from src.utils import get_top_n
 from src.vacancy import Vacancy
 
 
 def user_interaction() -> None:
+    """Функция взаимодействия с пользователем"""
     search_query = input("Введите поисковый запрос: ")
-    search = HeadHunterAPI(search_query).get_vacancies()
 
     top_n = int(input("Введите количество вакансий для вывода в топ N: "))
 
@@ -16,11 +17,24 @@ def user_interaction() -> None:
     experience = int(input("Введите стаж работы по искомой профессии (в годах): "))
     city = input("Введите город для поиска работы: ")
 
-    vacancies = Vacancy(salary_range, city, experience, filter_words)
-    vacancies.custom(search)
-    search_result = vacancies.filter_vacancies()
+    search = HeadHunterAPI().get_vacancies(search_query)
+
+    vacancies = Vacancy("Python", "https://hh.ru/vacancy/112770759", "100000-200000")
+    search_result = vacancies.filter_vacancies(search, salary_range, city, experience, filter_words)
 
     result = get_top_n(search_result, top_n)
+
+    json_saver = JsonSaver
+    json_saver.save_data(result, "user_search")
+
+    csv_saver = CSVSaver
+    csv_saver.save_data(result, "user_search")
+
+    excel_saver = ExcelSaver
+    excel_saver.save_data(result, "user_search")
+
+    txt_saver = TXTSaver
+    txt_saver.save_data(result, "user_search")
 
     print(f"Топ-{top_n} вакансий по вашему запросу:")
 
@@ -34,9 +48,11 @@ def user_interaction() -> None:
                 f"Зарплата: От {vacancy["salary"]["from"]}\n"
                 f"Опыт работы: {vacancy["experience"]["name"]}\n"
             )
-        print(
-            f"\nНазвание вакансии: {vacancy["name"]}\n"
-            f"URL: {vacancy["alternate_url"]}\n"
-            f"Зарплата: От {vacancy["salary"]["from"]} до {vacancy["salary"]["to"]}\n"
-            f"Опыт работы: {vacancy["experience"]["name"]}\n"
-        )
+        else:
+            print(
+                f"\nНазвание вакансии: {vacancy["name"]}\n"
+                f"URL: {vacancy["alternate_url"]}\n"
+                f"Зарплата: От {vacancy["salary"]["from"]} до {vacancy["salary"]["to"]}\n"
+                f"Опыт работы: {vacancy["experience"]["name"]}\n"
+            )
+            print(JsonSaver.get_data("data", "user_search"))
